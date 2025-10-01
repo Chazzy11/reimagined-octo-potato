@@ -27,6 +27,24 @@ func TestSystemPromptContainsKeyThemes(t *testing.T) {
 	}
 }
 
+// TestSystemPromptRequiresJSONFormat verifies JSON response requirement
+func TestSystemPromptRequiresJSONFormat(t *testing.T) {
+	if !strings.Contains(systemPrompt, "JSON") {
+		t.Error("systemPrompt should require JSON format responses")
+	}
+}
+
+// TestSystemPromptHasStructuredFormat verifies expected JSON structure is documented
+func TestSystemPromptHasStructuredFormat(t *testing.T) {
+	requiredFields := []string{"narration", "scene_type", "inventory", "location", "choices"}
+
+	for _, field := range requiredFields {
+		if !strings.Contains(systemPrompt, field) {
+			t.Errorf("systemPrompt should document the '%s' field", field)
+		}
+	}
+}
+
 // Test if system prompt contains rules
 func TestSystemPromptContainsRules(t *testing.T) {
 	if !strings.Contains(strings.ToLower(systemPrompt), "rules") {
@@ -100,5 +118,90 @@ func TestValidateInputBlocksPromptInjection(t *testing.T) {
 		if err == nil {
 			t.Errorf("validateInput should block malicious input '%s', but it was allowed", input)
 		}
+	}
+}
+
+// TestFindChoiceReturnsCorrectChoice verifies choice lookup works
+func TestFindChoiceReturnsCorrectChoice(t *testing.T) {
+	choices := []Choice{
+		{ID: "a", Action: "First option", Theme: "courage"},
+		{ID: "b", Action: "Second option", Theme: "wisdom"},
+		{ID: "c", Action: "Third option", Theme: "compassion"},
+	}
+
+	result := findChoice(choices, "b")
+	if result == nil {
+		t.Error("findChoice should find choice 'b'")
+	}
+	if result.Action != "Second option" {
+		t.Errorf("Expected 'Second option', got '%s'", result.Action)
+	}
+}
+
+// TestFindChoiceReturnsNilForInvalidChoice verifies invalid choices return nil
+func TestFindChoiceReturnsNilForInvalidChoice(t *testing.T) {
+	choices := []Choice{
+		{ID: "a", Action: "First option"},
+		{ID: "b", Action: "Second option"},
+	}
+
+	result := findChoice(choices, "z")
+	if result != nil {
+		t.Error("findChoice should return nil for non-existent choice")
+	}
+}
+
+// TestGetChoiceIDsFormatsCorrectly verifies choice ID string generation
+func TestGetChoiceIDsFormatsCorrectly(t *testing.T) {
+	choices := []Choice{
+		{ID: "a", Action: "First"},
+		{ID: "b", Action: "Second"},
+		{ID: "c", Action: "Third"},
+	}
+
+	result := getChoiceIDs(choices)
+	expected := "a/b/c"
+	if result != expected {
+		t.Errorf("Expected '%s', got '%s'", expected, result)
+	}
+}
+
+// TestChoiceStructure verifies Choice struct can hold expected data
+func TestChoiceStructure(t *testing.T) {
+	choice := Choice{
+		ID:     "a",
+		Action: "Test action",
+		Theme:  "test theme",
+	}
+
+	if choice.ID != "a" {
+		t.Error("Choice should store ID correctly")
+	}
+	if choice.Action != "Test action" {
+		t.Error("Choice should store Action correctly")
+	}
+	if choice.Theme != "test theme" {
+		t.Error("Choice should store Theme correctly")
+	}
+}
+
+// TestGameResponseStructure verifies GameResponse can hold expected data
+func TestGameResponseStructure(t *testing.T) {
+	resp := GameResponse{
+		Narration: "Test narration",
+		SceneType: "exploration",
+		Inventory: []string{"item1", "item2"},
+		Location:  "Test Location",
+		Choices:   []Choice{{ID: "a", Action: "Test"}},
+	}
+
+	if resp.Narration != "Test narration" {
+		t.Error("GameResponse should store Narration")
+	}
+	if len(resp.Inventory) != 2 {
+		t.Error("GameResponse should store Inventory")
+	}
+	if len(resp.Choices) != 1 {
+		t.Error("GameResponse should store Choices")
 	}
 }
