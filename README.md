@@ -10,7 +10,8 @@ This CLI game creates an interactive fairy tale experience inspired by stories o
 
 - 🌙 Dark, atmospheric storytelling with philosophical depth
 - 🎭 Morally complex characters and meaningful choices
-- 📖 Dynamic narrative that remembers your actions
+- 🔄 Hybrid gameplay: Free-form exploration mixed with multiple-choice decisions at pivotal moments
+- 📦 State tracking: Automatic inventory and location management
 - ✨ Poetic, evocative language
 - 🔮 Unique story every time you play
 
@@ -54,21 +55,54 @@ Run the game:
 make run
 ```
 
-Example gameplay:
+The game intelligently switches between two modes:
+**Free-form Exploration** (most of the time):
 
 ```bash
-✨ You: ask the old woman why she helps me
-🧚 Pixie Guide: She doesn't answer right away. Her fingers continue 
-spinning thread from nothing, from air and shadow. "Help?" she finally 
-says. "I give you choices, child. Whether they help or harm you depends 
-entirely on what you choose to see." Her eyes reflect something ancient. 
-"Now—will you take the thread, or leave empty-handed?"
+📍 The Whispering Woods
+────────────────────────────────
+🧚 Pixie Guide: You find yourself in a misty glade...
 
-✨ You: take the thread
-🧚 Pixie Guide: It burns cold in your palm, alive with possibility...
+✨ Your action: examine the ancient tree
+```
+Type your actions naturally, and the story will respond.
+
+**Multiple Choice Decisions** (at critical moments):
+
+```bash
+📍 The Crossroads
+🎒 Inventory: silver thread, broken compass
+────────────────────────────────
+🧚 Pixie Guide: Three paths stretch before you...
+
+✨ Choose your path:
+   a) The moonlit path [courage]
+   b) The shadowed path [wisdom]
+   c) Wait until dawn [patience]
+
+💫 Your choice: a
 ```
 
-Type your actions naturally, and the story will respond. Type `quit` to exit.
+ Type `quit` to exit.
+
+## Technical Details
+
+The game uses a structured JSON response system where the AI returns:
+
+```bash
+{
+  "narration": "Story text...",
+  "scene_type": "exploration|decision_point|revelation|danger|conversation",
+  "inventory": ["item1", "item2"],
+  "location": "Current Location",
+  "choices": [] // Optional: present only at critical moments
+}
+```
+This enables:
+
+- State persistence across the story
+- Dynamic switching between exploration and constrained choices
+- Inventory and location tracking
 
 ## Cost
 
